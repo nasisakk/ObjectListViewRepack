@@ -603,6 +603,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
+using System.Text.Json;
 
 namespace BrightIdeasSoftware
 {
@@ -5431,13 +5432,10 @@ namespace BrightIdeasSoftware
                 olvState.ColumnWidths.Add(column.Width);
             }
 
-            // Now that we have stored our state, convert it to a byte array
-            using (MemoryStream ms = new MemoryStream()) {
-                BinaryFormatter serializer = new BinaryFormatter();
-                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
-                serializer.Serialize(ms, olvState);
-                return ms.ToArray();
-            }
+// begin nasisakk modification: BianryFormatter is deprecated in net70. Replace it with JsonSerializer
+// but continue to use a byte array to maintain the existing api
+            return System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(olvState));
+// end nasisakk modification
         }
 
         /// <summary>
@@ -5447,6 +5445,7 @@ namespace BrightIdeasSoftware
         /// <param name="state">A byte array returned from SaveState()</param>
         /// <returns>Returns true if the state was restored</returns>
         public virtual bool RestoreState(byte[] state) {
+            /*
             using (MemoryStream ms = new MemoryStream(state)) {
                 BinaryFormatter deserializer = new BinaryFormatter();
                 ObjectListViewState olvState;
@@ -5483,28 +5482,76 @@ namespace BrightIdeasSoftware
             }
 
             return true;
+            */
+// begin nasisakk modification: BianryFormatter is deprecated in net70. Replace it with JsonSerializer
+// but continue to use a byte array to maintain the existing api
+            ObjectListViewState olvState;
+            try
+            {
+                olvState = JsonSerializer.Deserialize<ObjectListViewState>(System.Text.Encoding.UTF8.GetString(state));
+            }
+            catch(JsonException)
+            {
+                return false;
+            }
+// end nasisakk modification
+            // The number of columns has changed. We have no way to match old
+            // columns to the new ones, so we just give up.
+            if (olvState == null || olvState.NumberOfColumns != this.AllColumns.Count)
+                return false;
+            if (olvState.SortColumn == -1)
+            {
+                this.PrimarySortColumn = null;
+                this.PrimarySortOrder = SortOrder.None;
+            }
+            else
+            {
+                this.PrimarySortColumn = this.AllColumns[olvState.SortColumn];
+                this.PrimarySortOrder = olvState.LastSortOrder;
+            }
+            for (int i = 0; i < olvState.NumberOfColumns; i++)
+            {
+                OLVColumn column = this.AllColumns[i];
+                column.Width = (int)olvState.ColumnWidths[i];
+                column.IsVisible = (bool)olvState.ColumnIsVisible[i];
+                column.LastDisplayIndex = (int)olvState.ColumnDisplayIndicies[i];
+            }
+            // ReSharper disable RedundantCheckBeforeAssignment
+            if (olvState.IsShowingGroups != this.ShowGroups)
+                // ReSharper restore RedundantCheckBeforeAssignment
+                this.ShowGroups = olvState.IsShowingGroups;
+            if (this.View == olvState.CurrentView)
+                this.RebuildColumns();
+            else
+                this.View = olvState.CurrentView;
+
+            return true;
         }
 
+        // begin nasisakk modification: In order to move away from BinaryFormatter (which is now deprecated) to json, 
+        // ObjectListViewState is now public and everything is a property. The ArrayLists are also converted to
+        // List<bool> / List<int> so json serialization is simpler.
         /// <summary>
         /// Instances of this class are used to store the state of an ObjectListView.
         /// </summary>
         [Serializable]
-        internal class ObjectListViewState
+        public class ObjectListViewState
         {
 // ReSharper disable NotAccessedField.Global
-            public int VersionNumber = 1;
+            public int VersionNumber { get; set; } = 1;
 // ReSharper restore NotAccessedField.Global
-            public int NumberOfColumns = 1;
-            public View CurrentView;
-            public int SortColumn = -1;
-            public bool IsShowingGroups;
-            public SortOrder LastSortOrder = SortOrder.None;
+            public int NumberOfColumns { get; set; } = 1;
+            public View CurrentView { get; set; }
+            public int SortColumn { get; set; } = -1;
+            public bool IsShowingGroups { get; set; }
+            public SortOrder LastSortOrder { get; set; } = SortOrder.None;
 // ReSharper disable FieldCanBeMadeReadOnly.Global
-            public ArrayList ColumnIsVisible = new ArrayList();
-            public ArrayList ColumnDisplayIndicies = new ArrayList();
-            public ArrayList ColumnWidths = new ArrayList();
+            public List<bool> ColumnIsVisible { get; set; } = new List<bool>();
+            public List<int> ColumnDisplayIndicies { get; set; } = new List<int>();
+            public List<int> ColumnWidths { get; set; } = new List<int>();
 // ReSharper restore FieldCanBeMadeReadOnly.Global
         }
+// end nasisakk modification
 
         #endregion
 

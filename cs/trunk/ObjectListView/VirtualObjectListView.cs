@@ -391,7 +391,13 @@ namespace BrightIdeasSoftware
 
                 // Get around the 'private' marker on 'virtualListSize' field using reflection
                 if (virtualListSizeFieldInfo == null) {
+// begin nasisakk modification: in net7.0, microsoft renamed a number of private members to have the underscore prefix
+#if NET7_0_OR_GREATER
+                    virtualListSizeFieldInfo = typeof(ListView).GetField("_virtualListSize", BindingFlags.NonPublic | BindingFlags.Instance);
+#else
                     virtualListSizeFieldInfo = typeof(ListView).GetField("virtualListSize", BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
+                    // end nasisakk modification
                     System.Diagnostics.Debug.Assert(virtualListSizeFieldInfo != null);
                 }
 
@@ -405,9 +411,9 @@ namespace BrightIdeasSoftware
         }
         static private FieldInfo virtualListSizeFieldInfo;
 
-        #endregion
+#endregion
 
-        #region OLV accessing
+#region OLV accessing
 
         /// <summary>
         /// Return the number of items in the list
@@ -455,9 +461,9 @@ namespace BrightIdeasSoftware
             return index >= 0 ? this.GetItem(index) : null;
         }
 
-        #endregion
+#endregion
 
-        #region Object manipulation
+#region Object manipulation
 
         /// <summary>
         /// Add the given collection of model objects to this control.
@@ -723,9 +729,9 @@ namespace BrightIdeasSoftware
             }
         }
 
-        #endregion
+#endregion
 
-        #region Check boxes
+#region Check boxes
 //
 //        /// <summary>
 //        /// Check all rows
@@ -787,9 +793,9 @@ namespace BrightIdeasSoftware
             return CheckState.Unchecked;
         }
 
-        #endregion
+#endregion
 
-        #region Implementation
+#region Implementation
 
         /// <summary>
         /// Rebuild the list with its current contents.
@@ -1152,9 +1158,9 @@ namespace BrightIdeasSoftware
                 this.SetVirtualListSize(this.VirtualListDataSource.GetObjectCount());
         }
 
-        #endregion
+#endregion
 
-        #region Event handlers
+#region Event handlers
 
         /// <summary>
         /// Handle the CacheVirtualItems event
@@ -1243,13 +1249,13 @@ namespace BrightIdeasSoftware
             return this.VirtualListDataSource.SearchText(text, first, last, column);
         }
 
-        #endregion
+#endregion
 
-        #region Variable declarations
+#region Variable declarations
 
         private OLVListItem lastRetrieveVirtualItem;
         private int lastRetrieveVirtualItemIndex = -1;
 
-        #endregion
+#endregion
     }
 }
