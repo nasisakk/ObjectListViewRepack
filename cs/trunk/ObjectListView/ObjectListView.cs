@@ -605,6 +605,8 @@ using System.Runtime.Serialization.Formatters;
 using System.Threading;
 using System.Text.Json;
 
+using MethodInvoker = System.Windows.Forms.MethodInvoker;
+
 namespace BrightIdeasSoftware
 {
     /// <summary>

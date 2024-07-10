@@ -80,6 +80,8 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
+using MethodInvoker = System.Windows.Forms.MethodInvoker;
+
 namespace BrightIdeasSoftware
 {
     /// <summary>

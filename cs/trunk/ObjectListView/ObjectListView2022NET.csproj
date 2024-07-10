@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net6.0-windows;net7.0-windows</TargetFrameworks>
+    <TargetFrameworks>net6.0-windows;net7.0-windows;net8.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon />
     <StartupObject />
@@ -14,10 +14,10 @@
     <Copyright>Copyright 2006-2016 Bright Ideas Software</Copyright>
     <RepositoryUrl>https://github.com/nasisakk/ObjectListViewRepack</RepositoryUrl>
     <PackageProjectUrl>https://github.com/nasisakk/ObjectListViewRepack</PackageProjectUrl>
-    <PackageVersion>2.9.4</PackageVersion>
-    <Version>2.9.4</Version>
-    <FileVersion>2.9.4</FileVersion>
-    <AssemblyVersion>2.9.4</AssemblyVersion>
+    <PackageVersion>2.9.5</PackageVersion>
+    <Version>2.9.5</Version>
+    <FileVersion>2.9.5</FileVersion>
+    <AssemblyVersion>2.9.5</AssemblyVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IncludeSymbols>True</IncludeSymbols>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
