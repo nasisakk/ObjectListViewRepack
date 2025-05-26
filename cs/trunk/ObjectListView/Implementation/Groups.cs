@@ -747,7 +747,7 @@ namespace BrightIdeasSoftware
         {
             this.StateMask ^= mask;
             if (value)
-                this.State ^= mask;
+                this.State |= mask;
             else
                 this.State &= ~mask;
 
